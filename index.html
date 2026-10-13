@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Radar Concurrentiel — Novembre 2026 — SMI</title>
+<link href="https://fonts.googleapis.com/css2?family=Karla:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --indigo:#7B59F5; --carotte:#FF7131; --noir:#0D142C; --blanc:#FFFFFF; }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Karla',system-ui,sans-serif;background:var(--blanc);color:var(--noir);font-size:15px;line-height:1.6;}
+
+  .header{background:var(--noir);padding:40px 48px 36px;}
+  .header-inner{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:24px;}
+  .header-label{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:3px;}
+  .header-title{font-size:26px;font-weight:800;color:var(--blanc);line-height:1.2;}
+  .header-title span{color:var(--carotte);}
+  .header-date{font-size:12px;color:rgba(255,255,255,.35);margin-top:4px;}
+  .header-chips{margin-top:24px;display:flex;gap:8px;flex-wrap:wrap;}
+  .chip{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;border:1px solid rgba(123,89,245,.5);color:rgba(255,255,255,.6);text-decoration:none;transition:background .15s;}
+  .chip:hover{background:rgba(123,89,245,.3);color:var(--blanc);}
+
+  .wrap{max-width:880px;margin:0 auto;padding:44px 28px 72px;}
+  .spacer{height:44px;}
+  .section-title{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--indigo);margin-bottom:20px;padding-bottom:8px;border-bottom:2px solid var(--indigo);}
+
+  .stat-block{background:var(--indigo);border-radius:12px;padding:24px 28px;color:var(--blanc);display:flex;align-items:center;gap:24px;margin-bottom:44px;}
+  .stat-number{font-size:46px;font-weight:800;line-height:1;white-space:nowrap;}
+  .stat-number sup{font-size:20px;vertical-align:super;}
+  .stat-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:4px;}
+  .stat-text{font-size:13.5px;line-height:1.5;color:rgba(255,255,255,.85);}
+  .stat-text strong{color:var(--blanc);}
+
+  .platform-card{background:var(--blanc);border-radius:14px;margin-bottom:28px;border:1.5px solid rgba(13,20,44,.1);}
+  .platform-header{padding:16px 24px;display:flex;align-items:center;gap:14px;border-bottom:1px solid rgba(13,20,44,.07);}
+  .platform-badge{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:var(--blanc);flex-shrink:0;}
+  .b-noir{background:var(--noir);} .b-carotte{background:var(--carotte);} .b-indigo{background:var(--indigo);}
+  .platform-name{font-size:16px;font-weight:800;color:var(--noir);}
+  .platform-tagline{font-size:11px;color:rgba(13,20,44,.4);margin-top:1px;}
+  .priority-tag{margin-left:auto;padding:3px 10px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;flex-shrink:0;}
+  .tag-p{background:rgba(123,89,245,.1);color:var(--indigo);}
+  .tag-s{background:rgba(13,20,44,.06);color:rgba(13,20,44,.4);}
+  .platform-body{padding:20px 24px 24px;}
+
+  .feat-list{list-style:none;display:flex;flex-direction:column;gap:10px;}
+  .feat-item{border-radius:10px;border:1px solid rgba(13,20,44,.08);overflow:hidden;}
+
+  .feat-head{padding:10px 14px;background:rgba(123,89,245,.04);}
+  .feat-head strong{font-size:13px;font-weight:800;color:var(--noir);display:block;line-height:1.3;}
+  .feat-tech{font-size:11.5px;color:rgba(13,20,44,.45);margin-top:2px;font-style:italic;}
+
+  .feat-cta{margin-top:6px;display:flex;gap:12px;flex-wrap:wrap;}
+  .cta-link{font-size:11px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:3px;transition:opacity .15s;}
+  .cta-link:hover{opacity:.65;text-decoration:underline;}
+  .cta-off{color:var(--indigo);} .cta-src{color:var(--carotte);}
+  .cta-sep{color:rgba(13,20,44,.2);font-size:11px;}
+
+  .feat-impacts{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid rgba(13,20,44,.07);}
+  .feat-impact{padding:7px 12px;font-size:12px;line-height:1.4;}
+  .feat-impact:first-child{border-right:1px solid rgba(13,20,44,.07);}
+  .impact-label{font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px;}
+  .label-creator{color:var(--indigo);} .label-brand{color:var(--carotte);}
+  .feat-impact span{color:rgba(13,20,44,.58);display:block;}
+
+  .feat-smi{padding:7px 12px;border-top:1px solid rgba(13,20,44,.07);font-size:12px;line-height:1.4;display:flex;gap:8px;align-items:flex-start;}
+  .smi-tag{flex-shrink:0;padding:2px 7px;border-radius:5px;font-size:9px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-top:1px;}
+  .smi-faiblesse{background:rgba(255,113,49,.12);color:var(--carotte);}
+  .smi-force{background:rgba(123,89,245,.12);color:var(--indigo);}
+  .feat-smi span{color:rgba(13,20,44,.62);}
+
+  .new-badge{display:inline-block;padding:1px 6px;border-radius:5px;font-size:9px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;background:var(--carotte);color:var(--blanc);margin-left:5px;vertical-align:middle;}
+
+  .bilan-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+  .bilan-card{border-radius:12px;padding:20px;}
+  .bilan-force{border:2px solid var(--indigo);}
+  .bilan-faiblesse{border:2px solid var(--carotte);}
+  .bilan-title{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;}
+  .bilan-force .bilan-title{color:var(--indigo);}
+  .bilan-faiblesse .bilan-title{color:var(--carotte);}
+  .bilan-list{list-style:none;display:flex;flex-direction:column;gap:7px;}
+  .bilan-item{font-size:12.5px;line-height:1.4;color:rgba(13,20,44,.65);padding-left:12px;position:relative;}
+  .bilan-item::before{content:'';position:absolute;left:0;top:6px;width:4px;height:4px;border-radius:50%;}
+  .bilan-force .bilan-item::before{background:var(--indigo);}
+  .bilan-faiblesse .bilan-item::before{background:var(--carotte);}
+  .bilan-item strong{color:var(--noir);}
+
+  .table-wrap{border-radius:12px;overflow:hidden;border:1.5px solid rgba(13,20,44,.1);margin-bottom:16px;}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  thead th{padding:10px 12px;background:var(--noir);color:var(--blanc);font-weight:700;text-align:left;font-size:10px;letter-spacing:.06em;text-transform:uppercase;}
+  thead th.smi-col{color:var(--indigo);}
+  tbody tr:nth-child(odd){background:rgba(123,89,245,.03);}
+  tbody tr:nth-child(even){background:var(--blanc);}
+  tbody td{padding:8px 12px;border-bottom:1px solid rgba(13,20,44,.06);vertical-align:middle;}
+  tbody td:first-child{font-weight:700;}
+  .check{color:var(--indigo);font-weight:800;}
+  .cross{color:rgba(13,20,44,.18);}
+  .partial{color:var(--carotte);font-weight:700;font-size:11px;}
+
+  .radar-card{background:var(--noir);border-radius:12px;padding:24px 28px;}
+  .radar-card h3{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--carotte);margin-bottom:16px;}
+  .radar-list{list-style:none;display:flex;flex-direction:column;gap:12px;}
+  .radar-item{display:flex;gap:12px;align-items:flex-start;font-size:13.5px;line-height:1.5;}
+  .radar-num{flex-shrink:0;width:22px;height:22px;border:1px solid rgba(255,113,49,.4);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:10px;color:var(--carotte);}
+  .radar-item span{color:rgba(255,255,255,.75);}
+  .radar-item strong{color:var(--blanc);}
+
+  .footer{text-align:center;padding:24px;font-size:11px;color:rgba(13,20,44,.3);border-top:1px solid rgba(13,20,44,.08);max-width:880px;margin:0 auto;}
+  .footer strong{color:var(--indigo);}
+
+  @media(max-width:640px){
+    .header{padding:28px 20px;}
+    .header-inner{flex-direction:column;}
+    .stat-block{flex-direction:column;gap:14px;}
+    .stat-number{font-size:38px;}
+    .wrap{padding:24px 14px 48px;}
+    .feat-impacts{grid-template-columns:1fr;}
+    .feat-impact:first-child{border-right:none;border-bottom:1px solid rgba(13,20,44,.07);}
+    .bilan-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <img src="https://i.imgur.com/5Ao7FgV.png" alt="Shop My Influence" style="height:32px">
+    <div style="text-align:right">
+      <div class="header-label">Usage interne · CODIR & Équipe commerciale</div>
+      <div class="header-title">Radar Concurrentiel <span>#01</span></div>
+      <div class="header-date">Novembre 2026 · Édition spéciale fonctionnalités</div>
+    </div>
+  </div>
+  <div class="header-chips">
+    <a class="chip" href="#shopmy">ShopMy</a>
+    <a class="chip" href="#ltk">LTK</a>
+    <a class="chip" href="#stylink">Stylink</a>
+    <a class="chip" href="#metapic">Metapic</a>
+    <a class="chip" href="#affilae">Affilae</a>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="stat-block">
+    <div class="stat-number">1,5<sup>Md$</sup></div>
+    <div class="stat-body">
+      <div class="stat-label">Le chiffre du mois</div>
+      <div class="stat-text">ShopMy valorisée à <strong>1,5 milliard de dollars</strong> en octobre 2025 — licorne en 5 ans. 240 000 créateurs, 1 600 marques, 1 milliard de dollars de ventes annuelles. LTK a mis 14 ans pour atteindre ce stade.</div>
+    </div>
+  </div>
+
+  <!-- ══ SHOPMY ══ -->
+  <div id="shopmy" class="section-title">ShopMy — Fonctionnalités technologiques</div>
+  <div class="platform-card">
+    <div class="platform-header">
+      <div class="platform-badge b-noir">SM</div>
+      <div>
+        <div class="platform-name">ShopMy</div>
+        <div class="platform-tagline">shopmy.us · États-Unis · Fondée 2020 · Valorisation 1,5 Md$</div>
+      </div>
+      <span class="priority-tag tag-p">Prioritaire</span>
+    </div>
+    <div class="platform-body">
+      <ul class="feat-list">
+
+        <li class="feat-item">
+          <div class="feat-head">
+            <strong>Génération de lien affilié universelle</strong>
+            <div class="feat-tech">N'importe quelle URL produit convertie en lien tracké via 50 000+ marchands partenaires (ShareASale, CJ, Impact, Rakuten).</div>
+            <div class="feat-cta"><a class="cta-link cta-src" href="https://www.influencer-hero.com/blogs/shopmy-pricing-and-review" target="_blank" rel="noopener">↗ Source — Influencer Hero, 2026</a></div>
+          </div>
+          <div class="feat-impacts">
+            <div class="feat-impact"><div class="impact-label label-creator">Créateurs</div><span>Partage n'importe quel produit sans s'inscrire à un programme de marque.</span></div>
+            <div class="feat-impact"><div class="impact-label label-brand">Marques</div><span>Atteint des créateurs qui mentionnent les produits de façon organique.</span></div>
+          </div>
+          <div class="feat-smi"><span class="smi-tag smi-force">Force SMI</span><span>SMI a un générateur de lien et une extension Chrome. Différence avec ShopMy : couverture limitée aux marques intégrées SMI vs 50 000+ marchands tiers.</span></div>
+        </li>
+
+        <li class="feat-item">
+          <div class="feat-head">
+            <strong>SnapShop — Extension navigateur</strong>
+            <div class="feat-tech">Extension Chrome/Safari : détecte le produit sur n'importe quelle page e-commerce et génère un lien affilié en 1 clic.</div>
+            <div class="feat-cta"><a class="cta-link cta-src" href="https://www.influencer-hero.com/blogs/shopmy-pricing-and-review" target="_blank" rel="noopener">↗ Source — Influencer Hero, 2026</a></div>
+          </div>
+          <div class="feat-impacts">
+            <div class="feat-impact"><div class="impact-label label-creator">Créateurs</div><span>Monétise pendant la navigation, sans ouvrir d'outil supplémentaire.</span></div>
+            <div class="feat-impact"><div class="impact-label label-brand">Marques</div><span>Plus de liens organiques générés = trafic affilié additionnel sans coût de recrutement.</span></div>
+          </div>
+          <div class="feat-smi"><span class="smi-tag smi-force">Force SMI</span><span>SMI a aussi une extension Chrome. L'avantage ShopMy : couverture universelle (tout marchand). SMI : marques du réseau uniquement.</span></div>
+        </li>
+
+        <li class="feat-item">
+          <div class="feat-head">
+            <strong>Lookbooks — Gifting automatisé</strong>
+            <div class="feat-tech">Catalogue digital configurable par la marque, sélection autonome par le créateur, intégration logistique. La marque configure une fois, les créateurs s'auto-servent.</div>
+            <div class="feat-cta"><a class="cta-link cta-src" href="https://techcrunch.com/2024/03/14/shopmy-influencer-marketing-platform-lands-18-5-million-funding-round" target="_blank" rel="noopener">↗ Source — TechCrunch, mars 2024</a></div>
+          </div>
+          <div class="feat-impacts">
+            <div class="feat-impact"><div class="impact-label label-creator">Créateurs</div><span>Choisit et reçoit des produits sans négocier, publie à sa guise.</span></div>
+            <div class="feat-impact"><div class="impact-label label-brand">Marques</div><span>Active des centaines de créateurs en quelques heures, sans allers-retours commerciaux.</span></div>
+          </div>
+          <div class="feat-smi"><span class="smi-tag smi-faiblesse">Faiblesse SMI</span><span>SMI propose une Campagne Gifting (2 000€ HT, gestion déléguée, visible dans l'app). Pas automatisée : chaque campagne passe par l'équipe. Moins scalable.</span></div>
+        </li>
+
+        <li class="feat-item">
+          <div class="feat-head">
+            <strong>Taste Profile — Personnalisation IA consommateur</strong>
+            <div class="feat-tech">Modèle ML qui apprend les préférences d'achat de chaque visiteur pour personnaliser les recommandations affichées sur la marketplace grand public.</div>
+            <div class="feat-cta"><a class="cta-link cta-src" href="https://www.prnewswire.com/news-releases/shopmy-launches-shopping-platform-a-personalized-destination-built-by-the-creators-you-trust-302516804.html" target="_blank" rel="noopener">↗ Source — PR Newswire, communiqué officiel</a></div>
+          </div>
+          <div class="feat-impacts">
+            <div class="feat-impact"><div class="impact-label label-creator">Créateurs</div><span>Ses produits sont présentés aux visiteurs les plus susceptibles d'acheter.</span></div>
+            <div class="feat-impact"><div class="impact-label label-brand">Marques</div><span>Trafic pré-qualifié par l'IA = meilleur ROAS, budget affiliation plus défendable.</span></div>
+          </div>
+          <div class="feat-smi"><span class="smi-tag smi-force">Force SMI</span><span>SMI dispose de shopmycollection.com (B2C public, référencé Google, storefront par créateur) + wishlist + Collections dans l'app. La couche IA de personnalisation consommateur reste à construire.</span></div>
+        </li>
+
+        <li class="feat-item">
+          <div class="feat-head">
+            <strong>Opportunities — Marketplace de briefs rémunérés</strong>
+            <div class="feat-tech">Publication de missions payantes côté marque, candidature côté créateur, paiement intégré. ShopMy prélève 15% sur chaque budget.</div>
+            <div class="feat-cta">
+              <a class="cta-link cta-src" href="https://www.influencer-hero.com/blogs/shopmy-pricing-and-review" target="_blank" rel="noopener">↗ Influencer Hero, 2026</a>
+              <span class="cta-sep">·</span>
+              <a class="cta-link cta-src" href="https://dc.fortune.com/2026/05/04/shopmy-unicorn-shopping-fashion-influencers-retail-tiffany-lopinsky/" target="_blank" rel="noopener">↗ Fortune, mai 2026</a>
+            </div>
+          </div>
+          <div class="feat-impacts">
+            <div class="feat-impact"><div class="impact-label label-creator">Créateurs</div><span>Trouve des missions rémunérées sans agence. Candidature directe, paiement sécurisé.</span></div>
+            <div class="feat-impact"><div class="impact-label label-brand">Marques</div><span>Campagnes payantes en self-serve. Tarif : 399$/mois + 15% sur budget campagne.</span></div>
+          </div>
+          <div class="feat-smi"><span class="smi-tag smi-force">Force SMI</span><span>SMI propose des campagnes rémunérées avec accompagnement humain A-Z — avantage réel pour les marques qui ne veulent pas gérer seules le casting.</span></div>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══ LTK ══ -->
+  <div class="spacer"></div>
+  <div id="ltk" class="section-title">LTK — Fonctionnalités technologiques</div>
+  <div class="platform-card">
+    <div class="platform-header">
+      <div class="platform-badge b-carotte">LTK</div>
+      <div>
+        <div class="platform-name">LTK (ex-LiketoKNOW.it)</div>
+        <div class="platform-tagline">shopltk.com · États-Unis · Fondée 2011 · 350 000 créateurs · 40M shoppers</div>
+      </div>
+      <span class="priority-tag tag-p">Prioritaire</span>
+    </div>
+    <div class="platform-body">
+      <ul class="feat-list">
+
+        <li class="feat-item">
+          <div class="feat-head">
+            <strong>LTK Match.AI — Casting prédictif</strong>
+            <div class="feat-tech">ML entraîné sur 15 ans de données transactionnelles pour prédire le ROAS d'un créateur avant tout engagement budgétaire.</div>
+            <div class="feat-cta">
+              <a class="cta-link cta-off" href="https://company.shopltk.com/en/ltk-ai" target="_blank" rel="noopener">↗ Page officielle</a>
+              <span class="cta-sep">·</span>
+              <a class="cta-link cta-src" href="https://www.businesswire.com/news/home/20240916350249/en/" target="_blank" rel="noopener">↗ Business Wire, sept. 2024</a>
+            </div>
+          </div>
+          <div class="feat-impacts">
+            <div class="feat-impact"><div class="impact-label label-creator">Créateurs</div><span>Découvert par des marques dont l'univers correspond réellement à son audience.</span></div>
+            <div class="feat-impact"><div class="impact-label label-brand">Marques</div><span>Casting en quelques heures. ROAS prédit avant le lancement = budget justifiable en interne.</span></div>
+          </div>
+          <div class="feat-smi"><span class="smi-tag smi-faiblesse">Faiblesse SMI</span><span>Casting entièrement humain. SMI ne peut pas promettre de ROAS estimé avant campagne — ce que les marques data-driven demandent de plus en plus.</span></div>
+        </li>
+
+        <li class="feat-item">
+          <div class="feat-head">
+            <strong>LTK 360 — Reporting full funnel</strong>
+            <div class="feat-tech">Dashboard unifié connectant en temps réel les métriques awareness (reach, vues) aux métriques de conversion (clics, ventes, CA) sur toutes les campagnes.</div>
+            <div class="feat-cta">
+              <a class="cta-link cta-off" href="https://company.shopltk.com/en/ltk360" target="_blank" rel="noopener">↗ Page officielle</a>
+              <span class="cta-sep">·</span>
+              <a class="cta-link cta-src" href="https://www.businesswire.com/news/home/20240313947968/en/" target="_blank" rel="noopener">↗ Business Wire, mars 2024</a>
+            </div>
+          </div>
+          <div class="feat-impacts">
+            <div class="feat-impact"><div class="impact-label label-creator">Créateurs</div><span>Mesure son impact au-delà des ventes : portée, engagement, notoriété.</span></div>
+            <div class="feat-impact"><div class="impact-label label-brand">Marques</div><span>Justifie le budget influence au COMEX avec notoriété + conversion en une seule vue.</span></div>
+          </div>
+          <div class="feat-smi"><span class="smi-tag smi-faiblesse">Faiblesse SMI</span><span>SMI produit un reporting EMV + REACH en bilan de Campagne Paid, mais pas de dashboard full funnel temps réel sur tous les plans. Limite face aux marques à objectifs brand.</span></div>
+        </li>
+
+        <li class="feat-item">
+          <div class="feat-head">
+            <strong>LTK Boost — Amplification depuis le handle créateur</strong>
+            <div class="feat-tech">Contenu créateur diffusé comme publicité payante (Meta, TikTok) depuis le compte du créateur (whitelisting), pas depuis la page marque.</div>
+            <div class="feat-cta">
+              <a class="cta-link cta-off" href="https://company.shopltk.com/en/ltk-boost" target="_blank" rel="noopener">↗ Page officielle</a>
+              <span class="cta-sep">·</span>
+              <a class="cta-link cta-src" href="https://www.businesswire.com/news/home/20230323005041/en/Creator-Guided-Shopping-Platform-LTK-Launches-Social-Media-Advertising-for-Brands" target="_blank" rel="noopener">↗ Business Wire, mars 2023</a>
+            </div>
+          </div>
+          <div class="feat-impacts">
+            <div class="feat-impact"><div class="impact-label label-creator">Créateurs</div><span>Revenus additionnels sur du contenu déjà produit, sans travail supplémentaire.</span></div>
+            <div class="feat-impact"><div class="impact-label label-brand">Marques</div><span>CTR 2 à 3x supérieur aux publicités classiques. Budget paid media optimisé par l'authenticité du créateur.</span></div>
+          </div>
+          <div class="feat-smi"><span class="smi-tag smi-force">Force SMI</span><span>SMI propose une Campagne Paid (5 000€ HT, accompagnement A-Z, reporting EMV + ROI). Différence : LTK automatise le whitelisting ; SMI couvre le paid en managed service.</span></div>
+        </li>
+
+        <li class="feat-item">
+          <div class="feat-head">
+            <strong>LTK DM — Re-engagement automatique</strong>
+            <div class="feat-tech">Détecte les signaux d'intérêt d'un abonné (réaction, sauvegarde) et envoie automatiquement un message privé avec le lien affilié direct.</div>
+            <div class="feat-cta"><a class="cta-link cta-off" href="https://company.shopltk.com/en/brands" target="_blank" rel="noopener">↗ Page marques LTK</a></div>
+          </div>
+          <div class="feat-impacts">
+            <div class="feat-impact"><div class="impact-label label-creator">Créateurs</div><span>Convertit les abonnés intéressés sans créer de contenu supplémentaire.</span></div>
+            <div class="feat-impact"><div class="impact-label label-brand">Marques</div><span>Reciblage comportemental dans le canal influence, inaccessible aux outils publicitaires classiques.</span></div>
+          </div>
+          <div class="feat-smi"><span class="smi-tag smi-faiblesse">Faiblesse SMI</span><span>Pas de mécanisme de relance automatique post-publication. La relation créateur/abonné s'arrête au contenu publié.</span></div>
+        </li>
+
+        <li class="feat-item">
+          <div class="feat-head">
+            <strong>LTK AI Agentique — Automatisation du workflow entier <span class="new-badge">Bêta Q4 2026</span></strong>
+            <div class="feat-tech">IA qui orchestre en autonomie : sélection créateurs → brief → envoi → monitoring → optimisation → reporting, sans intervention humaine entre chaque étape.</div>
+            <div class="feat-cta"><a class="cta-link cta-src" href="https://secure.businesswire.com/news/home/20260826188603/en/LTK-Brings-Creator-Marketing-Into-the-Agentic-Era-With-New-Expanded-Brand-Platform-Experience" target="_blank" rel="noopener">↗ Business Wire, 26 août 2026</a></div>
+          </div>
+          <div class="feat-impacts">
+            <div class="feat-impact"><div class="impact-label label-creator">Créateurs</div><span>Reçoit des briefs mieux ciblés sur son profil réel.</span></div>
+            <div class="feat-impact"><div class="impact-label label-brand">Marques</div><span>Lance et optimise une campagne influence avec la même autonomie qu'une campagne Google Ads.</span></div>
+          </div>
+          <div class="feat-smi"><span class="smi-tag smi-faiblesse">Faiblesse SMI</span><span>Signal le plus critique de cette édition. Si LTK ouvre cet outil en Q4 2026, SMI devra répondre sur la valeur de l'accompagnement humain — ou accélérer sa feuille de route produit.</span></div>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══ SECONDAIRES ══ -->
+  <div class="spacer"></div>
+  <div class="section-title">Plateformes secondaires — Fonctionnalités clés</div>
+
+  <!-- STYLINK -->
+  <div class="platform-card">
+    <div class="platform-header">
+      <div id="stylink" class="platform-badge b-indigo">SL</div>
+      <div>
+        <div class="platform-name">Stylink</div>
+        <div class="platform-tagline">stylink.com · Allemagne · Fondée 2017 · 90 000 créateurs · 30+ pays</div>
+      </div>
+      <span class="priority-tag tag-s">Secondaire</span>
+    </div>
+    <div class="platform-body">
+      <ul class="feat-list">
+
+        <li class="feat-item">
+          <div class="feat-head">
+            <strong>Linkmaker WhatsApp</strong>
+            <div class="feat-tech">WhatsApp Business API : envoyer une URL produit sur un numéro dédié, recevoir un lien affilié tracké en retour. Zéro application tierce.</div>
+            <div class="feat-cta">
+              <a class="cta-link cta-off" href="https://www.stylink.com" target="_blank" rel="noopener">↗ Site officiel</a>
+              <span class="cta-sep">·</span>
+              <a class="cta-link cta-src" href="https://www.commissionfactory.com/market-insights/affiliate-marketing/publisher-spotlight-stylink" target="_blank" rel="noopener">↗ Commission Factory</a>
+            </div>
+          </div>
+          <div class="feat-impacts">
+            <div class="feat-impact"><div class="impact-label label-creator">Créateurs</div><span>Monétise via WhatsApp, sans installer aucun outil supplémentaire.</span></div>
+            <div class="feat-impact"><div class="impact-label label-brand">Marques</div><span>Atteint des micro-créateurs qui n'installeraient jamais une application dédiée.</span></div>
+          </div>
+          <div class="feat-smi"><span class="smi-tag smi-faiblesse">Faiblesse SMI</span><span>SMI a app + extension Chrome, mais les deux requièrent installation et compte. Le linkmaker WhatsApp élimine entièrement ce prérequis pour les profils les moins technophiles.</span></div>
+        </li>
+
+        <li class="feat-item">
+          <div class="feat-head">
+            <strong>Modèle CPA/CPC hybride</strong>
+            <div class="feat-tech">Marque payée en CPA (vente), créateur rémunéré en CPC (clic). Stylink absorbe le risque de conversion entre les deux.</div>
+            <div class="feat-cta"><a class="cta-link cta-src" href="https://www.commissionfactory.com/market-insights/affiliate-marketing/publisher-spotlight-stylink" target="_blank" rel="noopener">↗ Commission Factory</a></div>
+          </div>
+          <div class="feat-impacts">
+            <div class="feat-impact"><div class="impact-label label-creator">Créateurs</div><span>Revenus garantis au clic, sans dépendre de la conversion finale.</span></div>
+            <div class="feat-impact"><div class="impact-label label-brand">Marques</div><span>Paient uniquement sur vente. Aucune surprise budgétaire.</span></div>
+          </div>
+          <div class="feat-smi"><span class="smi-tag smi-force">Force SMI</span><span>SMI est en CPA pur côté marque — le plus transparent. La garantie CPC côté créateurs est un argument d'acquisition que SMI n'a pas encore.</span></div>
+        </li>
+
+        <li class="feat-item">
+          <div class="feat-head">
+            <strong>Stylink UGC — Commande de vidéos à la pièce</strong>
+            <div class="feat-tech">Brief, validation et livraison de vidéos courtes (UGC) entièrement gérés dans la plateforme. À partir de 189€/vidéo.</div>
+            <div class="feat-cta">
+              <a class="cta-link cta-off" href="https://www.stylink.com" target="_blank" rel="noopener">↗ Site officiel</a>
+              <span class="cta-sep">·</span>
+              <a class="cta-link cta-src" href="https://influee.co/fr/blog/stylink-ugc-alternatives" target="_blank" rel="noopener">↗ Influee, 2026</a>
+            </div>
+          </div>
+          <div class="feat-impacts">
+            <div class="feat-impact"><div class="impact-label label-creator">Créateurs</div><span>Cachet fixe garanti, indépendant de toute performance d'affiliation.</span></div>
+            <div class="feat-impact"><div class="impact-label label-brand">Marques</div><span>Vidéo authentique à coût contrôlé, réutilisable en paid media.</span></div>
+          </div>
+          <div class="feat-smi"><span class="smi-tag smi-faiblesse">Faiblesse SMI</span><span>Pas de production UGC packagée. Segment en croissance que le réseau SMI pourrait couvrir naturellement.</span></div>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+
+  <!-- METAPIC -->
+  <div class="platform-card">
+    <div class="platform-header">
+      <div id="metapic" class="platform-badge b-noir">MP</div>
+      <div>
+        <div class="platform-name">Metapic</div>
+        <div class="platform-tagline">metapic.com · Suède (Groupe NYORDA) · Fondée 2017 · 60 000+ créateurs · 18+ marchés</div>
+      </div>
+      <span class="priority-tag tag-s">Secondaire</span>
+    </div>
+    <div class="platform-body">
+      <ul class="feat-list">
+
+        <li class="feat-item">
+          <div class="feat-head">
+            <strong>Tracking full funnel unifié <span class="new-badge">Juillet 2026</span></strong>
+            <div class="feat-tech">Pixel + S2S capturant les signaux awareness (vues, clics) et les événements d'achat dans une seule couche de données. TikTok et Snapchat en cours.</div>
+            <div class="feat-cta"><a class="cta-link cta-src" href="https://www.inderes.fi/en/releases/nyorda-ab-metapic-launches-new-tracking-technology-and-creator-app-as-growth-accelerates-across-europe" target="_blank" rel="noopener">↗ Communiqué NYORDA, 9 juil. 2026</a></div>
+          </div>
+          <div class="feat-impacts">
+            <div class="feat-impact"><div class="impact-label label-creator">Créateurs</div><span>Son impact sur la notoriété devient mesurable, pas seulement ses ventes.</span></div>
+            <div class="feat-impact"><div class="impact-label label-brand">Marques</div><span>Notoriété et performance dans un seul tableau de bord.</span></div>
+          </div>
+          <div class="feat-smi"><span class="smi-tag smi-faiblesse">Faiblesse SMI</span><span>SMI produit un reporting EMV + REACH en bilan de Campagne Paid, mais pas de dashboard full funnel temps réel sur tous les plans. Si ce standard se généralise, SMI devra évoluer.</span></div>
+        </li>
+
+        <li class="feat-item">
+          <div class="feat-head">
+            <strong>Application créateurs mobile <span class="new-badge">Bêta Juillet 2026</span></strong>
+            <div class="feat-tech">App mobile avec push notifications sur les campagnes, dashboard de performance en temps réel et candidature simplifiée.</div>
+            <div class="feat-cta"><a class="cta-link cta-src" href="https://www.inderes.fi/en/releases/nyorda-ab-metapic-launches-new-tracking-technology-and-creator-app-as-growth-accelerates-across-europe" target="_blank" rel="noopener">↗ Communiqué NYORDA, 9 juil. 2026</a></div>
+          </div>
+          <div class="feat-impacts">
+            <div class="feat-impact"><div class="impact-label label-creator">Créateurs</div><span>Gère tous ses partenariats depuis son téléphone.</span></div>
+            <div class="feat-impact"><div class="impact-label label-brand">Marques</div><span>Activation créateurs plus rapide, délai entre brief et publication raccourci.</span></div>
+          </div>
+          <div class="feat-smi"><span class="smi-tag smi-force">Force SMI</span><span>SMI dispose d'une application créateurs mature là où Metapic n'en est qu'en bêta. À valoriser activement dans le recrutement.</span></div>
+        </li>
+
+        <li class="feat-item">
+          <div class="feat-head">
+            <strong>Live Shopping Video</strong>
+            <div class="feat-tech">Co-diffusion en direct marque/créateur avec liens affiliés intégrés en temps réel et tracking des achats pendant la diffusion.</div>
+            <div class="feat-cta"><a class="cta-link cta-src" href="https://www.commissionfactory.com/market-insights/affiliate-marketing/publisher-spotlight-metapic" target="_blank" rel="noopener">↗ Commission Factory</a></div>
+          </div>
+          <div class="feat-impacts">
+            <div class="feat-impact"><div class="impact-label label-creator">Créateurs</div><span>Monétise en direct, format qui renforce l'engagement communautaire.</span></div>
+            <div class="feat-impact"><div class="impact-label label-brand">Marques</div><span>Achats impulsifs favorisés par le direct, attribution immédiate des ventes.</span></div>
+          </div>
+          <div class="feat-smi"><span class="smi-tag smi-faiblesse">Faiblesse SMI</span><span>SMI ne couvre pas le live shopping. Format en forte croissance sur TikTok et Instagram, notamment en mode et beauté.</span></div>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+
+  <!-- AFFILAE -->
+  <div class="platform-card">
+    <div class="platform-header">
+      <div id="affilae" class="platform-badge b-carotte">AF</div>
+      <div>
+        <div class="platform-name">Affilae</div>
+        <div class="platform-tagline">affilae.com · France (Bordeaux) · Fondée 2012 · 600+ annonceurs</div>
+      </div>
+      <span class="priority-tag tag-s">Secondaire</span>
+    </div>
+    <div class="platform-body">
+      <ul class="feat-list">
+
+        <li class="feat-item">
+          <div class="feat-head">
+            <strong>Smart Tracking — Suivi sans cookies tiers</strong>
+            <div class="feat-tech">Tracking first-party + S2S + modélisation probabiliste pour maintenir l'attribution des conversions malgré la disparition des cookies tiers.</div>
+            <div class="feat-cta">
+              <a class="cta-link cta-off" href="https://www.affilae.com" target="_blank" rel="noopener">↗ Site officiel</a>
+              <span class="cta-sep">·</span>
+              <a class="cta-link cta-src" href="https://jai-un-pote-dans-la.com/affilae-barometre-affiliation-influence-performance/" target="_blank" rel="noopener">↗ Baromètre Affilae 2026</a>
+            </div>
+          </div>
+          <div class="feat-impacts">
+            <div class="feat-impact"><div class="impact-label label-creator">Créateurs</div><span>Attribution plus précise = moins de conversions non comptabilisées, moins de litiges.</span></div>
+            <div class="feat-impact"><div class="impact-label label-brand">Marques</div><span>Mesure maintenue sans dépendre des navigateurs tiers. Anticipation Chrome et iOS.</span></div>
+          </div>
+          <div class="feat-smi"><span class="smi-tag smi-force">Force SMI</span><span>SMI dispose d'un tracking robuste (S2S, codes promo 100% indépendants des cookies). Argument commercial fort face aux marques touchées par les pertes d'attribution display.</span></div>
+        </li>
+
+        <li class="feat-item">
+          <div class="feat-head">
+            <strong>Logiciel SaaS d'affiliation en marque blanche</strong>
+            <div class="feat-tech">Les marques gèrent leur programme d'affiliation sans réseau intermédiaire. Abonnement fixe, API ouverte, intégrations natives Shopify, WooCommerce, PrestaShop, WordPress.</div>
+            <div class="feat-cta">
+              <a class="cta-link cta-off" href="https://www.affilae.com" target="_blank" rel="noopener">↗ Site officiel</a>
+              <span class="cta-sep">·</span>
+              <a class="cta-link cta-src" href="https://jai-un-pote-dans-la.com/affilae-barometre-affiliation-influence-performance/" target="_blank" rel="noopener">↗ Baromètre Affilae 2026</a>
+            </div>
+          </div>
+          <div class="feat-impacts">
+            <div class="feat-impact"><div class="impact-label label-creator">Créateurs</div><span>Rejoint les programmes directement chez la marque, plus de transparence sur les commissions.</span></div>
+            <div class="feat-impact"><div class="impact-label label-brand">Marques</div><span>Coût fixe, aucune commission sur CA. Contrôle total des données et relations affiliés.</span></div>
+          </div>
+          <div class="feat-smi"><span class="smi-tag smi-faiblesse">Faiblesse SMI</span><span>Affilae confirme que 53% de leurs partenariats impliquent des créateurs. Ils se rapprochent du territoire SMI avec un argument prix fort. SMI doit affirmer sa supériorité sur la profondeur d'outillage créateurs et l'accompagnement.</span></div>
+        </li>
+
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══ BILAN SMI ══ -->
+  <div class="spacer"></div>
+  <div class="section-title">Ce que la veille révèle sur SMI</div>
+  <div class="bilan-grid">
+    <div class="bilan-card bilan-force">
+      <div class="bilan-title">Forces confirmées</div>
+      <ul class="bilan-list">
+        <li class="bilan-item"><strong>Modèle CPA pur</strong> — Aucun abonnement, zéro risque financier. Le plus transparent du marché.</li>
+        <li class="bilan-item"><strong>Accompagnement humain</strong> — LTK l'a réintroduit sous forme payante (Optimize). SMI le propose nativement.</li>
+        <li class="bilan-item"><strong>Extension Chrome + générateur de lien</strong> — Outils existants. Différence avec ShopMy/LTK : couverture marchands, pas absence d'outil.</li>
+        <li class="bilan-item"><strong>Marketplace B2C</strong> — shopmycollection.com public + SEO, wishlist et Collections dans l'app. Surface consommateur existante.</li>
+        <li class="bilan-item"><strong>Campagne Paid managée</strong> — 5 000€ HT, A-Z, reporting EMV + ROI + REACH. Paid couvert en service.</li>
+        <li class="bilan-item"><strong>App mobile créateurs mature</strong> — Avantage concret sur Metapic (bêta) et Stylink (absent).</li>
+        <li class="bilan-item"><strong>Tracking robuste</strong> — S2S + codes promo 100% indépendants des cookies. En avance sur Affilae et Metapic.</li>
+        <li class="bilan-item"><strong>Réseau curé</strong> — 5 000 créateurs présélectionnés. Engagement moyen 2x supérieur à la moyenne marché.</li>
+      </ul>
+    </div>
+    <div class="bilan-card bilan-faiblesse">
+      <div class="bilan-title">Faiblesses révélées</div>
+      <ul class="bilan-list">
+        <li class="bilan-item"><strong>Pas de dashboard full funnel temps réel</strong> — SMI produit EMV/REACH en bilan de Campagne Paid uniquement. LTK 360 et Metapic le font en continu sur toutes les offres.</li>
+        <li class="bilan-item"><strong>Pas d'IA de casting</strong> — LTK prédit le ROAS avant engagement. SMI ne peut pas promettre de donnée prédictive.</li>
+        <li class="bilan-item"><strong>Couverture liens limitée au réseau SMI</strong> — ShopMy couvre 50 000+ marchands tiers. Frein à l'adoption spontanée.</li>
+        <li class="bilan-item"><strong>Gifting non automatisé</strong> — Campagne Gifting gérée par l'équipe (2 000€ HT). Moins scalable que ShopMy Lookbooks.</li>
+        <li class="bilan-item"><strong>Pas d'amplification automatisée</strong> — LTK Boost diffuse en whitelisting depuis le compte créateur. SMI : managed service uniquement.</li>
+        <li class="bilan-item"><strong>Pas de UGC packagé</strong> — Stylink vend des vidéos à la pièce. Segment que SMI pourrait couvrir naturellement.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ══ TABLEAU ══ -->
+  <div class="spacer"></div>
+  <div class="section-title">Tableau comparatif des fonctionnalités clés</div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:27%">Fonctionnalité</th>
+          <th style="text-align:center">ShopMy</th>
+          <th style="text-align:center">LTK</th>
+          <th style="text-align:center">Stylink</th>
+          <th style="text-align:center">Metapic</th>
+          <th style="text-align:center">Affilae</th>
+          <th class="smi-col" style="text-align:center">SMI</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Liens affiliés</td><td style="text-align:center"><span class="check">✓</span></td><td style="text-align:center"><span class="check">✓</span></td><td style="text-align:center"><span class="check">✓</span></td><td style="text-align:center"><span class="check">✓</span></td><td style="text-align:center"><span class="check">✓</span></td><td style="text-align:center"><span class="check">✓</span></td></tr>
+        <tr><td>Boutique créateur</td><td style="text-align:center"><span class="check">✓</span></td><td style="text-align:center"><span class="check">✓</span></td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="check">✓</span></td></tr>
+        <tr><td>Application mobile créateurs</td><td style="text-align:center"><span class="check">✓</span></td><td style="text-align:center"><span class="check">✓</span></td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="partial">Bêta</span></td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="check">✓</span></td></tr>
+        <tr><td>Extension navigateur</td><td style="text-align:center"><span class="check">✓</span></td><td style="text-align:center"><span class="check">✓</span></td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="check">✓</span></td></tr>
+        <tr><td>Gifting automatisé</td><td style="text-align:center"><span class="check">✓</span></td><td style="text-align:center"><span class="check">✓</span></td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="cross">—</span></td></tr>
+        <tr><td>Campagnes rémunérées in-app</td><td style="text-align:center"><span class="check">✓</span></td><td style="text-align:center"><span class="check">✓</span></td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="check">✓</span></td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="check">✓</span></td></tr>
+        <tr><td>Reporting full funnel</td><td style="text-align:center"><span class="partial">Partiel</span></td><td style="text-align:center"><span class="check">✓</span></td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="check">✓</span></td><td style="text-align:center"><span class="partial">Partiel</span></td><td style="text-align:center"><span class="partial">Partiel</span></td></tr>
+        <tr><td>Casting par IA</td><td style="text-align:center"><span class="partial">Partiel</span></td><td style="text-align:center"><span class="check">✓</span></td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="cross">—</span></td></tr>
+        <tr><td>Amplification payante</td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="check">✓</span></td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="partial">Partiel</span></td></tr>
+        <tr><td>Tracking sans cookies tiers</td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="check">✓</span></td><td style="text-align:center"><span class="check">✓</span></td><td style="text-align:center"><span class="check">✓</span></td></tr>
+        <tr><td>Modèle 100% CPA</td><td style="text-align:center"><span class="check">✓</span></td><td style="text-align:center"><span class="partial">Partiel</span></td><td style="text-align:center"><span class="partial">Hybride</span></td><td style="text-align:center"><span class="check">✓</span></td><td style="text-align:center"><span class="check">✓</span></td><td style="text-align:center"><span class="check">✓</span></td></tr>
+        <tr><td>Accompagnement humain</td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="check">✓</span></td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="cross">—</span></td><td style="text-align:center"><span class="check">✓</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ══ RADAR ══ -->
+  <div class="spacer"></div>
+  <div class="section-title">À surveiller en décembre 2026</div>
+  <div class="radar-card">
+    <h3>Signaux à confirmer le mois prochain</h3>
+    <ul class="radar-list">
+      <li class="radar-item"><div class="radar-num">1</div><span><strong>LTK AI Agentique — sortie de bêta fermée.</strong> Signal technologique le plus important de l'année. SMI doit préparer sa réponse argumentaire dès maintenant.</span></li>
+      <li class="radar-item"><div class="radar-num">2</div><span><strong>Metapic — déploiement TikTok et Snapchat.</strong> Changerait leur couverture en France, notamment sur les 18-34 ans. À surveiller pour les marques mode et beauté.</span></li>
+      <li class="radar-item"><div class="radar-num">3</div><span><strong>ShopMy — restructuration tarifaire.</strong> Frictions documentées sur le gifting 2026. Un nouveau plan intermédiaire est possible. Opportunité de recrutement marques à anticiper.</span></li>
+    </ul>
+  </div>
+
+</div>
+
+<div class="footer">
+  <strong>Shop My Influence</strong> · Radar Concurrentiel #01 · Novembre 2026<br>
+  Document interne · CODIR & Équipe commerciale · Ne pas diffuser à l'extérieur<br>
+  Données issues de sources publiques — mise à jour mensuelle.
+</div>
+
+</body>
+</html>
